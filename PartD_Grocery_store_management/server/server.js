@@ -1,0 +1,27 @@
+require("dotenv").config()
+const express = require("express")
+const cors = require("cors")
+const corsOptions = require("./config/corsOptions")
+const connectDB = require("./config/dbconnect")
+const { default: mongoose } = require("mongoose")
+
+const PORT = process.env.PORT || 7000
+const app = express()
+connectDB()
+app.use(cors(corsOptions))
+app.use(express.static("public"))
+app.use("/api/auth", require("./routes/suppliersRoute"))
+
+ app.get("/", (req, res)=>{res.send("This is home page")})
+
+
+ mongoose.connection.once('open',()=>{
+    console.log('Connect to database')
+    app.listen(PORT,()=>{
+        console.log(`server running on ${PORT}`);
+    })
+})
+
+mongoose.connection.on('error', err=> {
+    console.log(err)
+})
