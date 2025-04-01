@@ -1,0 +1,3 @@
+CREATE DATABASE PartB_Table
+GO
+
