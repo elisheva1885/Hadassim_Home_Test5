@@ -3,8 +3,8 @@ const Goods = require("../models/Products")
 const Suppliers = require("../models/Suppliers")
 
 const register = async (req, res) => {
-    const { companyName, phoneNumber, representative_Name, goodsList } = req.body
-    if (!companyName || !phoneNumber || !representative_Name || !goodsList) {
+    const { companyName, phoneNumber, representative_Name, productsList } = req.body
+    if (!companyName || !phoneNumber || !representative_Name || !productsList) {
         return res.status(400).json({ message: "all field are reqired" })
     }
     const duplicate = await Suppliers.findOne({'companyName': companyName,  'representative_Name': representative_Name }).lean()
@@ -12,7 +12,7 @@ const register = async (req, res) => {
     if (duplicate) {
         return res.status(409).json({ message: "this company already have such a representative" })
     }
-    const supplier = await Suppliers.create({ companyName, phoneNumber, representative_Name, goodsList })
+    const supplier = await Suppliers.create({ companyName, phoneNumber, representative_Name, productsList })
     if (supplier) {
         return res.status(201).json({ message: `New supplier created` })
     }

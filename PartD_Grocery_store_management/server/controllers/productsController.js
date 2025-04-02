@@ -1,18 +1,18 @@
 const Products = require('../models/Products')
 
 const createProduct = async (req,res) => {
-    const {name, itemPrice, minimum_quantity} = req.body
-    if(!name|| !itemPrice|| !minimum_quantity)
+    const {name, price, minimum_quantity} = req.body
+    if(!name|| !price|| !minimum_quantity)
         return res.status(400).json({ message: "all details are required" })
     
     const duplicate = await Products.findOne({name: name}).lean()
     if (duplicate) 
-        return res.status(409).json({ message: "this good already exist" })
+        return res.status(409).json({ message: "this product already exist" })
     
-    const product = await Products.create({name, itemPrice, minimum_quantity})
+    const product = await Products.create({name, price, minimum_quantity})
     if(product)
         return res.status(201).json(product)
-    return res.status(400).json({ message: "invalid good" })
+    return res.status(400).json({ message: "invalid product" })
     
 }
 

@@ -12,7 +12,7 @@ const suppiersSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    goodsList: {
+    productsList: {
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Products' }],
         reqired: true,
     }   

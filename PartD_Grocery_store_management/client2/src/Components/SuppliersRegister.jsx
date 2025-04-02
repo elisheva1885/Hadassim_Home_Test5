@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
+import './Login.css';
+import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
@@ -9,27 +10,13 @@ import { Checkbox } from 'primereact/checkbox';
 import { Dialog } from 'primereact/dialog';
 import { Divider } from 'primereact/divider';
 import { classNames } from 'primereact/utils';
-import { MultiSelect } from 'primereact/multiselect';
-import '../FormDemo.css';
-import 'primereact/resources/themes/lara-light-indigo/theme.css';
-import 'primereact/resources/primereact.min.css';
-import 'primeicons/primeicons.css';
-import axios from 'axios'
-import CreateProduct from './CreateProduct';
-import ProductsContext from '../Context/ProductsContext';
+import axios from 'axios';
 
-export const SuppliersRegister = () => {
+const SuppliersRegister = () => {
+    const [countries, setCountries] = useState([]);
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
-    // const [products, setProducts] = useState({});
-    const [selectAll, setSelectAll] = useState(false);
-    const [selectedItems, setSelectedItems] = useState(null);
-    const [visible, setVisible] = useState(false);
-    const productsContext = useContext(ProductsContext) 
-    const products = productsContext.products
-    const setProducts = productsContext.setProducts
-
-    console.log("at the start of the compinent",products);
+    const [products, setProducts] = useState({});
 
     const defaultValues = {
         name: '',
@@ -44,7 +31,7 @@ export const SuppliersRegister = () => {
         try {
             const res = await axios.get('http://localhost:8000/api/products')
             if (res.status === 200) {
-                setProducts((res.data).map((product) => ({ label: product.name, value: product._id })))
+                setProducts(res.data)
                 console.log("SuppliersRegister", products);
             }
         }
@@ -53,10 +40,9 @@ export const SuppliersRegister = () => {
                 alert("no products you welcome to add")
         }
     }
-
     useEffect(() => {
         getProducts()
-    }, []);
+    }, []); 
 
     const { control, formState: { errors }, handleSubmit, reset } = useForm({ defaultValues });
 
@@ -66,8 +52,6 @@ export const SuppliersRegister = () => {
 
         reset();
     };
-
-   
 
     const getFormErrorMessage = (name) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
@@ -124,6 +108,15 @@ export const SuppliersRegister = () => {
                             </span>
                             {getFormErrorMessage('phoneNumber')}
                         </div>
+                        {/* <div className="field">
+                            <span className="p-float-label">
+                                <Controller name="password" control={control} rules={{ required: 'Password is required.' }} render={({ field, fieldState }) => (
+                                    <InputText id={field.name} {...field} toggleMask className={classNames({ 'p-invalid': fieldState.invalid })} header={passwordHeader} footer={passwordFooter} />
+                                )} />
+                                <label htmlFor="password" className={classNames({ 'p-error': errors.password })}>Password*</label>
+                            </span>
+                            {getFormErrorMessage('password')}
+                        </div> */}
                         <div className="field">
                             <span className="p-float-label">
                                 <Controller name="representative_Name" control={control} rules={{ required: 'representative_Name is required.' }} render={({ field }) => (
@@ -133,34 +126,14 @@ export const SuppliersRegister = () => {
                             </span>
                             {getFormErrorMessage('representative_Name')}
                         </div>
-                        <div className="field">
-                            <MultiSelect
-                                value={selectedItems}
-                                options={products}
-                                onChange={(e) => {
-                                    setSelectedItems(e.value);
-                                    setSelectAll(e.value.length === products.length);
-                                }}
-                                selectAll={selectAll}
-                                onSelectAll={(e) => {
-                                    setSelectedItems(e.checked ? [] : products?.map((product) => product.value));
-                                    setSelectAll(!e.checked);
-                                }}
-                                virtualScrollerOptions={{ itemSize: 43 }}
-                                maxSelectedLabels={3}
-                                placeholder="Select Items"
-                                className="w-full md:w-20rem"
-                            />
-
-                            <div className="card flex justify-content-center">
-                                <Button label="ToAddProduct" icon="pi pi-external-link" onClick={() => setVisible(true)} />
-                                <Dialog header="Header" visible={visible} style={{ width: '50vw' }} onHide={() => { if (!visible) return; setVisible(false); }}>
-                                    <p className="m-0">
-                                    <CreateProduct/>
-                                    </p>
-                                </Dialog>
-                            </div>
-                        </div>
+                        {/* <div className="field">
+                            <span className="p-float-label">
+                                <Controller name="Products" control={control} render={({ field }) => (
+                                    <Dropdown id={field.name} value={field._id} onChange={(e) => field.onChange(e.value)} options={products} optionLabel="name" />
+                                )} />
+                                <label htmlFor="Products">Products</label>
+                            </span>
+                        </div> */}
                         <div className="field-checkbox">
                             <Controller name="accept" control={control} rules={{ required: true }} render={({ field, fieldState }) => (
                                 <Checkbox inputId={field.name} onChange={(e) => field.onChange(e.checked)} checked={field.value} className={classNames({ 'p-invalid': fieldState.invalid })} />
@@ -174,6 +147,7 @@ export const SuppliersRegister = () => {
             </div>
         </div>
     );
-}
 
+
+}
 export default SuppliersRegister
