@@ -10,7 +10,9 @@ const app = express()
 connectDB()
 app.use(cors(corsOptions))
 app.use(express.static("public"))
+app.use(express.json())
 app.use("/api/auth", require("./routes/suppliersRoute"))
+app.use("/api/products", require("./routes/productsRoute"))
 
  app.get("/", (req, res)=>{res.send("This is home page")})
 

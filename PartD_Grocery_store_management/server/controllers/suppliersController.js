@@ -1,4 +1,4 @@
-const Goods = require("../models/Goods")
+const Goods = require("../models/Products")
 // const jwt = require('jsonwebtoken')
 const Suppliers = require("../models/Suppliers")
 
@@ -39,7 +39,7 @@ const login = async (req, res) => {
     //     goodsList: foundSupplier.goodsList
     // }
     // const accessToken = jwt.sign(supplierInfo, process.env.ACCESS_TOKEN_SECRET)
-    res.status(200).json({companyName: supplierInfo.companyName,representative_Name: supplierInfo.representative_Name })
+    res.status(200).json({companyName: foundSupplier.companyName,representative_Name: foundSupplier.representative_Name })
 }
 
 module.exports = { login, register }

@@ -13,9 +13,8 @@ const suppiersSchema = new mongoose.Schema({
         required: true,
     },
     goodsList: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Products' }],
         reqired: true,
-        ref: 'Goods'
     }   
 }, {
     timestamps: true
