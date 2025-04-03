@@ -1,10 +1,11 @@
-const Goods = require("../models/Products")
+const Products = require("../models/Products")
 // const jwt = require('jsonwebtoken')
 const Suppliers = require("../models/Suppliers")
+const bcrypt = require("bcrypt")
 
 const register = async (req, res) => {
-    const { companyName, phoneNumber, representative_Name, productsList } = req.body
-    if (!companyName || !phoneNumber || !representative_Name || !productsList) {
+    const { companyName, phoneNumber, representative_Name, password ,productsList } = req.body
+    if (!companyName || !phoneNumber || !representative_Name || !password || !productsList) {
         return res.status(400).json({ message: "all field are reqired" })
     }
     const duplicate = await Suppliers.findOne({'companyName': companyName,  'representative_Name': representative_Name }).lean()
@@ -12,7 +13,9 @@ const register = async (req, res) => {
     if (duplicate) {
         return res.status(409).json({ message: "this company already have such a representative" })
     }
-    const supplier = await Suppliers.create({ companyName, phoneNumber, representative_Name, productsList })
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const supplierObject = { companyName, phoneNumber, representative_Name,password: hashedPassword, productsList  }
+    const supplier = await Suppliers.create(supplierObject)
     if (supplier) {
         return res.status(201).json({ message: `New supplier created` })
     }
@@ -23,23 +26,27 @@ const register = async (req, res) => {
 
 
 const login = async (req, res) => {
-    const { companyName, representative_Name } = req.body
-    if (!companyName || !representative_Name) {
+    const { companyName, representative_Name , password} = req.body
+    if (!companyName || !representative_Name || !password) {
         return res.status(400).json({ message: "all field are reqired" })
     }
     const foundSupplier = await Suppliers.findOne({'companyName': companyName,  'representative_Name': representative_Name }).lean()
     if (!foundSupplier) {
         return res.status(401).json({ message: "Unauthorized" })
     }
-    // const supplierInfo = {
-    //     _id: foundSupplier._id,
-    //     companyName: foundSupplier.companyName,
-    //     phoneNumber: foundSupplier.phoneNumber,
-    //     representative_Name: foundSupplier.representative_Name,
-    //     goodsList: foundSupplier.goodsList
-    // }
+    const match = await bcrypt.compare(password, foundSupplier.password)
+    if (!match) {
+        return res.status(401).json({ message: "Unauthorized" })
+    }
+    const supplierInfo = {
+        _id: foundSupplier._id,
+        companyName: foundSupplier.companyName,
+        phoneNumber: foundSupplier.phoneNumber,
+        representative_Name: foundSupplier.representative_Name,
+        productsList: foundSupplier.productsList
+    }
     // const accessToken = jwt.sign(supplierInfo, process.env.ACCESS_TOKEN_SECRET)
-    res.status(200).json({companyName: foundSupplier.companyName,representative_Name: foundSupplier.representative_Name })
+    res.status(201).json({companyName: supplierInfo.companyName,representative_Name: supplierInfo.representative_Name })
 }
 
 module.exports = { login, register }

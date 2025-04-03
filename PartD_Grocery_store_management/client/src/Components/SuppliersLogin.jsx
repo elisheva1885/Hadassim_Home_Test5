@@ -21,7 +21,7 @@ import { setProducts } from '../Store/Slices/productsSlice';
 import { useNavigate } from "react-router";
 import { setSupplierDetails } from '../Store/Slices/supplierDetailsSlice';
 
-export const SuppliersRegister = () => {
+export const SuppliersLogin = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
     // const [products, setProducts] = useState({});
@@ -32,53 +32,36 @@ export const SuppliersRegister = () => {
     // const products = productsContext.products
     // const setProducts = productsContext.setProducts
     const {products} = useSelector((state) => state.products);
-    // const {supplierDetails} = useSelector((state) => state.supplierDetails);
+    const {supplierDetails} = useSelector((state) => state.supplierDetails);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     console.log("at the start of the compinent",products);
 
     const defaultValues = {
         companyName: '',
-        phoneNumber: '',
         representative_Name: '',
         password: '',
-        productsList: selectedItems
     }
     const goToSupplierOrders = ()=> {
-        navigate("/orders")
+        navigate("/supplier/orders")
     }
-    const getProducts = async () => {
-        try {
-            const res = await axios.get('http://localhost:8000/api/products')
-            if (res.status === 200) {
-                dispatch(setProducts((res.data).map((product) => ({ label: product.name, value: product._id }))))
-                console.log("SuppliersRegister", products);
-            }
-        }
-        catch (error) {
-            if (error.status === 404)
-                alert("no products you welcome to add")
-        }
-    }
+   
 
-    const createSupplier = async (data) => {
+    const loginSupplier = async (data) => {
         try {
-            console.log("selectedItems",selectedItems)
-            data.productsList = selectedItems
-            console.log("data",data)
-
-            const res = await axios.post("http://localhost:8000/api/auth/register", data)
+            const res = await axios.post("http://localhost:8000/api/auth/login", data)
             if (res.status === 201) {
-                alert("supplier registered successfully")
-                dispatch(setSupplierDetails({companyName: res.data.companyName , representative_Name: res.data.representative_Name}))
-                // console.log("after seting",supplierDetails);
+                alert("supplier logined successfully")
+                console.log("res.data",res.data);
+                dispatch(setSupplierDetails(res.data))
+                console.log("after setting",supplierDetails);
                 goToSupplierOrders()
 
             }
         }
         catch (error) {
-            if (error.status === 409) {
-                alert("this supplier already exist")
+            if (error.status === 401) {
+                alert("Unauthorized")
             }
             else if (error.status === 400) {
                 alert("all details reqired")
@@ -87,13 +70,12 @@ export const SuppliersRegister = () => {
     }
 
     useEffect(() => {
-        getProducts()
     }, []);
 
     const { control, formState: { errors }, handleSubmit, reset } = useForm({ defaultValues });
 
     const onSubmit = (data) => {
-        createSupplier(data)
+        loginSupplier(data)
         setFormData(data);
         setShowMessage(true);
         // reset();
@@ -107,22 +89,22 @@ export const SuppliersRegister = () => {
 
     const dialogFooter = <div className="flex justify-content-center"><Button label="OK" className="p-button-text" autoFocus onClick={() => setShowMessage(false)} /></div>;
     const passwordHeader = <h6>Pick a password</h6>;
-    const passwordFooter = (
-        <React.Fragment>
-            <Divider />
-            <p className="mt-2">Suggestions</p>
-            <ul className="pl-2 ml-2 mt-0" style={{ lineHeight: '1.5' }}>
-                <li>At least one lowercase</li>
-                <li>At least one uppercase</li>
-                <li>At least one numeric</li>
-                <li>Minimum 8 characters</li>
-            </ul>
-        </React.Fragment>
-    );
+    // const passwordFooter = (
+    //     <React.Fragment>
+    //         <Divider />
+    //         <p className="mt-2">Suggestions</p>
+    //         <ul className="pl-2 ml-2 mt-0" style={{ lineHeight: '1.5' }}>
+    //             <li>At least one lowercase</li>
+    //             <li>At least one uppercase</li>
+    //             <li>At least one numeric</li>
+    //             <li>Minimum 8 characters</li>
+    //         </ul>
+    //     </React.Fragment>
+    // );
     return (
 
         <div className="form-demo">
-            <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={dialogFooter} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '30vw' }}>
+            {/* <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={dialogFooter} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '30vw' }}>
                 <div className="flex justify-content-center flex-column pt-6 px-3">
                     <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
                     <h5>Registration Successful!</h5>
@@ -130,7 +112,7 @@ export const SuppliersRegister = () => {
                         Your account is registered under name <b>{formData.name}</b> ; it'll be valid next 30 days without activation. Please check <b>{formData.email}</b> for activation instructions.
                     </p>
                 </div>
-            </Dialog>
+            </Dialog> */}
 
             <div className="flex justify-content-center">
                 <div className="card">
@@ -146,35 +128,24 @@ export const SuppliersRegister = () => {
                             {getFormErrorMessage('companyName')}
                         </div>
                         <div className="field">
-                            <span className="p-float-label p-input-icon-right">
-                                <Controller name="phoneNumber" control={control} rules={{ required: 'phoneNumber is required.' }}
-                                    render={({ field, fieldState }) => (
-                                        <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                    )} />
-                                <label htmlFor="phoneNumber" className={classNames({ 'p-error': errors.phoneNumber })}>phoneNumber*</label>
-                            </span>
-                            {getFormErrorMessage('phoneNumber')}
-                        </div>
-                        <div className="field">
-                            <span className="p-float-label p-input-icon-right">
-                                <Controller name="representative_Name" control={control} rules={{ required: 'representative_Name is required.' }}
-                                    render={({ field, fieldState }) => (
-                                        <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                    )} />
-                                <label htmlFor="representative_Name" className={classNames({ 'p-error': !!errors.representative_Name })}>representative Name*</label>
+                            <span className="p-float-label">
+                                <Controller name="representative_Name" control={control} rules={{ required: 'representative_Name is required.' }} render={({ field, fieldState }) => (
+                                    <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
+                                )} />
+                                <label htmlFor="representative_Name" className={classNames({ 'p-error': errors.representative_Name })}>representative_Name*</label>
                             </span>
                             {getFormErrorMessage('representative_Name')}
                         </div>
                         <div className="field">
                             <span className="p-float-label">
                                 <Controller name="password" control={control} rules={{ required: 'Password is required.' }} render={({ field, fieldState }) => (
-                                    <Password id={field.name} {...field} toggleMask className={classNames({ 'p-invalid': fieldState.invalid })} header={passwordHeader} footer={passwordFooter} />
+                                    <Password id={field.name} {...field} toggleMask className={classNames({ 'p-invalid': fieldState.invalid })} header={passwordHeader}  />
                                 )} />
                                 <label htmlFor="password" className={classNames({ 'p-error': errors.password })}>Password*</label>
                             </span>
                             {getFormErrorMessage('password')}
                         </div>
-                        <div className="field">
+                        {/* <div className="field">
                             <MultiSelect
                                 value={selectedItems}
                                 options={products}
@@ -201,15 +172,15 @@ export const SuppliersRegister = () => {
                                     </p>
                                 </Dialog>
                             </div>
-                        </div>
-                        <div className="field-checkbox">
+                        </div> */}
+                        {/* <div className="field-checkbox">
                             <Controller name="accept" control={control} rules={{ required: true }} render={({ field, fieldState }) => (
                                 <Checkbox inputId={field.name} onChange={(e) => field.onChange(e.checked)} checked={field.value} className={classNames({ 'p-invalid': fieldState.invalid })} />
                             )} />
                             <label htmlFor="accept" className={classNames({ 'p-error': errors.accept })}>I agree to the terms and conditions*</label>
-                        </div>
+                        </div> */}
 
-                        <Button type="submit" label="Submit" className="mt-2" />
+                        <Button type="submit" label="Login" className="mt-2" />
                     </form>
                 </div>
             </div>
@@ -217,4 +188,4 @@ export const SuppliersRegister = () => {
     );
 }
 
-export default SuppliersRegister
+export default SuppliersLogin

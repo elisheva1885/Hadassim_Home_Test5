@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const suppiersSchema = new mongoose.Schema({
+const suppliersSchema = new mongoose.Schema({
     companyName: {
         type: String,
         required: true,
@@ -12,6 +12,10 @@ const suppiersSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    password: {
+        type: String,
+        required: true   
+    },
     productsList: {
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Products' }],
         reqired: true,
@@ -19,4 +23,4 @@ const suppiersSchema = new mongoose.Schema({
 }, {
     timestamps: true
 })
-module.exports = mongoose.model('Suppiers', suppiersSchema)
+module.exports = mongoose.model('Suppliers', suppliersSchema)

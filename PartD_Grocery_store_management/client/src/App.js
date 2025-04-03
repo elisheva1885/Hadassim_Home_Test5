@@ -1,8 +1,8 @@
 import logo from './logo.svg';
 import './App.css';
 import SuppliersRegister from './Components/SuppliersRegister';
-import ProductsContext from './Context/ProductsContext';
 import { useState } from 'react';
+import Home from './Components/Home';
 function App() {
 
 //   const getProducts = async () => {
@@ -21,18 +21,13 @@ function App() {
 //     }
 // }
 
-const [products , setProducts] = useState([])
-// const toggleProduct = () => {
-//   setProducts
-// }
+
   
 
   return (
     
     <div className="App">
-      <ProductsContext.Provider value={{products, setProducts}}>
-     <SuppliersRegister/>
-     </ProductsContext.Provider>
+     <Home/>
     </div>
   );
 }
