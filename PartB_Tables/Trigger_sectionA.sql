@@ -1,29 +1,79 @@
---1. αγιχϊ ϊχιπεϊ, ΰιο μωπεϊ ξηιψ μξεφψ ατςψ ωμ ιεϊψ ξ10 ΰηεζ ξδξηιψ δχεγν
+ο»Ώ--1. Χ‘Χ“Χ™Χ§Χª ΧªΧ§Χ™Χ Χ•Χª, ΧΧ™Χ ΧΧ©Χ Χ•Χª ΧΧ—Χ™Χ¨ ΧΧΧ•Χ¦Χ¨ Χ‘Χ¤ΧΆΧ¨ Χ©Χ Χ™Χ•ΧªΧ¨ Χ10 ΧΧ—Χ•Χ– ΧΧ”ΧΧ—Χ™Χ¨ Χ”Χ§Χ•Χ“Χ
 -----------------------------------------------------------------------------------
 --use [PartB_Table]
-USE PartB_Table
 
-
-
-CREATE TRIGGER trg_connections ON dbo.Person_tbl
-AFTER INSERT,UPDATE
+CREATE TRIGGER trg_Connections 
+ON dbo.Person_tbl
+AFTER INSERT
 	AS
 	BEGIN
-		PRINT 'πλπρϊι μθψιβψ'
-		IF UPDATE(Cost) --δΰν πςωδ ωιπει αωγδ δξηιψ
-			BEGIN
-				PRINT 'δξηιψ δωϊπδ'
-				DECLARE @oldPrice money
-				DECLARE @newPrice money
-				SELECT @oldPrice = Cost FROM deleted --δξηιψ μτπι δςγλεο
-				SELECT @newPrice = Cost FROM inserted --δξηιψ μΰηψ δςγλεο
-				IF @oldPrice/100*10 < ABS(@newPrice-@oldPrice)
-				BEGIN
-					PRINT 'δωιπει αεθμ'
-					ROLLBACK--αιθεμ δτςεμδ , βμεμ ΰηεψδ, ΰμ ϊαφς ΰϊ δτςεμδ ωδτςιμδ ΰϊ δθψιβψ
+	    INSERT INTO dbo.Connection_tbl([Ξ΅erson_Id] , Relative_Id , Connection_Type)
+		SELECT [Ξ΅erson_Id] ,FathΠµr_Id , 'Father'
+		FROM inserted i
+		WHERE EXISTS (
+        SELECT 1 FROM dbo.Person_tbl person WHERE person.[Ξ΅erson_Id] = i.[Ξ΅erson_Id]
+    );
+		INSERT INTO dbo.Connection_tbl([Ξ΅erson_Id] , Relative_Id , Connection_Type)
+		SELECT [Ξ΅erson_Id] ,Mother_Id , 'Mother'
+		FROM inserted i
+		WHERE EXISTS (
+        SELECT 1 FROM dbo.Person_tbl person WHERE person.[Ξ΅erson_Id] = i.[Ξ΅erson_Id]
+    );
+		INSERT INTO dbo.Connection_tbl([Ξ΅erson_Id] , Relative_Id , Connection_Type)
+		SELECT [Ξ΅erson_Id] ,SpouΡ•e_Id , 'spouse'
+		FROM inserted i 
+		WHERE EXISTS (
+        SELECT 1 FROM dbo.Person_tbl person WHERE person.[Ξ΅erson_Id] = i.[Ξ΅erson_Id]
+    );
+		--PRINT 'Χ Χ›Χ Χ΅ΧªΧ™ ΧΧΧ¨Χ™Χ’Χ¨'
+		--IF UPDATE(Cost) --Χ”ΧΧ Χ ΧΆΧ©Χ” Χ©Χ™Χ Χ•Χ™ Χ‘Χ©Χ“Χ” Χ”ΧΧ—Χ™Χ¨
+		--	BEGIN
+		--		PRINT 'Χ”ΧΧ—Χ™Χ¨ Χ”Χ©ΧªΧ Χ”'
+		--		DECLARE @oldPrice money
+		--		DECLARE @newPrice money
+		--		SELECT @oldPrice = Cost FROM deleted --Χ”ΧΧ—Χ™Χ¨ ΧΧ¤Χ Χ™ Χ”ΧΆΧ“Χ›Χ•Χ
+		--		SELECT @newPrice = Cost FROM inserted --Χ”ΧΧ—Χ™Χ¨ ΧΧΧ—Χ¨ Χ”ΧΆΧ“Χ›Χ•Χ
+		--		IF @oldPrice/100*10 < ABS(@newPrice-@oldPrice)
+		--		BEGIN
+		--			PRINT 'Χ”Χ©Χ™Χ Χ•Χ™ Χ‘Χ•ΧΧ'
+		--			ROLLBACK--Χ‘Χ™ΧΧ•Χ Χ”Χ¤ΧΆΧ•ΧΧ” , Χ’ΧΧ•Χ ΧΧ—Χ•Χ¨Χ”, ΧΧ ΧªΧ‘Χ¦ΧΆ ΧΧª Χ”Χ¤ΧΆΧ•ΧΧ” Χ©Χ”Χ¤ΧΆΧ™ΧΧ” ΧΧª Χ”ΧΧ¨Χ™Χ’Χ¨
 			
-				END
-			END
+		--		END
+
 	END
 
+DROP TRIGGER trg_Connections
+
+	
+--CREATE TRIGGER trg_connections1
+--AFTER INSERT OR UPDATE ON dbo.Person_tbl
+--FOR EACH ROW
+--BEGIN
+--    INSERT INTO dbo.coConnection_tbl('Person_Id' , 'Relative_Id' , 'Connection_Type')
+--END;
+
 	select* from dbo.Person_tbl
+		select* from dbo.Connection_tbl
+
+
+INSERT INTO dbo.Person_tbl(Ξ΅erson_Id , [Person_Name] , Family_Name , Gender , FathΠµr_Id , Mother_Id , SpouΡ•e_Id)
+VALUES (1,'ΧΧ¨Χ™Χ”','Χ΅Χ¤Χ¨ΧΧ™', 'M',NULL , NULL,2)
+
+
+INSERT INTO dbo.Person_tbl(Ξ΅erson_Id , [Person_Name] , Family_Name , Gender , FathΠµr_Id , Mother_Id , SpouΡ•e_Id)
+VALUES (2,'ΧΧ΅ΧªΧ¨','Χ΅Χ¤Χ¨ΧΧ™', 'F',NULL , NULL,2)
+
+
+UPDATE dbo.Person_tbl
+SET SpouΡ•e_Id = 1
+WHERE Ξ΅erson_Id = 2;
+
+
+INSERT INTO dbo.Person_tbl(Ξ΅erson_Id , [Person_Name] , Family_Name , Gender , FathΠµr_Id , Mother_Id , SpouΡ•e_Id)
+VALUES (3,'Χ–ΧΧ‘','Χ§Χ•Χ¤ΧΧ•Χ‘Χ™Χ¥', 'M',NULL , NULL,4)
+
+INSERT INTO dbo.Person_tbl(Ξ΅erson_Id , [Person_Name] , Family_Name , Gender , FathΠµr_Id , Mother_Id , SpouΡ•e_Id)
+VALUES (4,'Χ©Χ•Χ©Χ Χ”','Χ§Χ•Χ¤ΧΧ•Χ‘Χ™Χ¥', 'F',NULL , NULL,3)
+
+INSERT INTO dbo.Person_tbl(Ξ΅erson_Id , [Person_Name] , Family_Name , Gender , FathΠµr_Id , Mother_Id , SpouΡ•e_Id)
+VALUES (5,'ΧΧ©Χ”','Χ΅Χ¤Χ¨ΧΧ™', 'M',1 , 2,6)

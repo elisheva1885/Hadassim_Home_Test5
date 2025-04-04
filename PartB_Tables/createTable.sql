@@ -17,11 +17,14 @@ GO
 
 CREATE TABLE Connection_tbl
 (
-	Ρerson_Id int primary key,
+	Ρerson_Id int,
 	Relative_Id  int ,
 	Connection_Type varchar(20),
-	FOREIGN KEY (Relative_Id) REFERENCES dbo.Person_tbl(Ρerson_Id)
+	FOREIGN KEY (Ρerson_Id) REFERENCES dbo.Person_tbl(Ρerson_Id)
+
 )
 GO
 
+
+DROP TABLE Connection_tbl
 
