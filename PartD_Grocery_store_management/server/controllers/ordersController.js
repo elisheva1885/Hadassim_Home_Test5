@@ -10,7 +10,7 @@ const createOrder = async (req,res) => {
     if(!supplierObject)
         return res.status(404).json({ message: "no such supplier" })
     const supplierProducts = await supplierController.getSupplierProducts(supplier)
-    products.map((product)=>{
+    products?.map((product)=>{
         if(supplierProducts.some(supplierProduct => supplierProduct._id === product._id)){
             return res.status(404).json({message: "the products isnt fit to the supplier"})
         }   

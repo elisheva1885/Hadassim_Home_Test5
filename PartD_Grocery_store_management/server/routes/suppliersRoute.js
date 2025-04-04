@@ -4,7 +4,8 @@ const suppliersController = require('../controllers/suppliersController')
 
 router.post("/auth/register", suppliersController.register)
 router.post("/auth/login", suppliersController.login)
-router.get("/", suppliersController.getSuppliersNames)
-router.get("/companies", suppliersController.getSuppliersCompanies)
+router.get("/byCompany/:company", suppliersController.getSuppliersNamesByCompany)
+router.get("/", suppliersController.getSuppliersCompanies)
+router.get("/:product_id", suppliersController.getSupplierByProduct)
 
 module.exports = router

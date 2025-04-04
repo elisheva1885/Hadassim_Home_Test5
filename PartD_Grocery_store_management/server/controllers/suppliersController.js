@@ -49,29 +49,54 @@ const login = async (req, res) => {
     res.status(201).json({token: accessToken ,companyName: supplierInfo.companyName,representative_Name: supplierInfo.representative_Name })
 }
 
-const getSupplierProducts = async (req,res)=> {
-    const supplierId = req.supplier._id 
+const getSupplierProducts = async (supplier)=> {
 
-    const supplierObject = await Suppliers.findById(supplierId).lean()
+    if (!supplier) {
+        throw new Error("Supplier data is missing");
+    }  
+    console.log(supplier);
+    const supplierObject = await Suppliers.findById(supplier).lean()
     if(!supplierObject){
-        return res.status(404).json({ message: "invalid supplier" })
+        throw new Error("invalid supplier");
+        // return res.status(404).json({ message: "invalid supplier" })
     }
-    return res.status(200).json({supplierProducts: supplierObject.productsList})
+    return supplierObject.productsList
+    // return res.status(200).json({supplierProducts: supplierObject.productsList})
 }
 
 const getSuppliersCompanies = async (req,res) => {
     const suppliers = await Suppliers.find().lean()
     if(!suppliers?.length)
          return res.status(404).json({ message: "no suppliers found" })
-
-    return res.status(200).json([...new Set(suppliers.companyName)])
+    const uniqueSuppliers = suppliers.filter((supplier, index, self) =>
+    index === self.findIndex((s) => s.companyName === supplier.companyName)
+    );
+    return res.status(200).json(uniqueSuppliers)
 }
 
-const getSuppliersNames = async (req,res) => {
-    const suppliers = await Suppliers.find().lean()
+const getSuppliersNamesByCompany = async (req,res) => {
+    const {company} = req.params
+    const suppliers = await Suppliers.find({company_Name:company}).lean()
     if(!suppliers?.length)
          return res.status(404).json({ message: "no suppliers found" })
     return res.status(200).json(suppliers.representative_Name)
 }
 
-module.exports = { login, register, getSupplierProducts, getSuppliersCompanies, getSuppliersNames }
+const getSupplierByProduct = async (req,res)=> {
+    const {product_id}= req.params
+    const product = await Products.findById(product_id).lean()
+    console.log(product);
+    if (!product) {
+        return res.status(400).json({ message: "all field are reqired" })
+    }
+    const suppliers = await Suppliers.find().lean()
+    if(!suppliers?.length)
+    return res.status(404).json({ message: "no suppliers found" })
+    const productSuppliers  = suppliers.filter(s=>  {   
+        return s.productsList.some(prod => prod.equals(product._id))})
+    if(!productSuppliers?.length)
+        return res.status(404).json({ message: "no supplier have this product" })
+    return res.status(200).json(productSuppliers)
+}
+
+module.exports = { login, register, getSupplierProducts, getSuppliersCompanies, getSuppliersNamesByCompany , getSupplierByProduct}

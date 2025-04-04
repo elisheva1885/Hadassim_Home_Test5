@@ -32,7 +32,7 @@ const readProductByName = async (req,res)=> {
 }
 
 const readProductById = async (req,res)=> {
-    const {_id} = req.body
+    const {_id} = req.params
     const product = await Products.findById(_id).lean()
     if(!product)
         return res.status(404).json({ message: "no product with this name" })

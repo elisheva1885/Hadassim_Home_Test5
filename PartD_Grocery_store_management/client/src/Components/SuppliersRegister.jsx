@@ -47,19 +47,7 @@ export const SuppliersRegister = () => {
     const goToSupplierOrders = ()=> {
         navigate("/orders")
     }
-    const getProducts = async () => {
-        try {
-            const res = await axios.get('http://localhost:8000/api/products')
-            if (res.status === 200) {
-                dispatch(setProducts((res.data).map((product) => ({ label: product.name, value: product._id }))))
-                console.log("SuppliersRegister", products);
-            }
-        }
-        catch (error) {
-            if (error.status === 404)
-                alert("no products you welcome to add")
-        }
-    }
+   
 
     const createSupplier = async (data) => {
         try {
@@ -86,9 +74,7 @@ export const SuppliersRegister = () => {
         }
     }
 
-    useEffect(() => {
-        getProducts()
-    }, []);
+   
 
     const { control, formState: { errors }, handleSubmit, reset } = useForm({ defaultValues });
 
