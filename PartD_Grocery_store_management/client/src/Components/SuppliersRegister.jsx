@@ -67,7 +67,7 @@ export const SuppliersRegister = () => {
             data.productsList = selectedItems
             console.log("data",data)
 
-            const res = await axios.post("http://localhost:8000/api/auth/register", data)
+            const res = await axios.post("http://localhost:8000/api/suppliers/auth/register", data)
             if (res.status === 201) {
                 alert("supplier registered successfully")
                 dispatch(setSupplierDetails({companyName: res.data.companyName , representative_Name: res.data.representative_Name}))

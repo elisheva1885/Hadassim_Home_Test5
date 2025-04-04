@@ -1,5 +1,5 @@
 const Products = require("../models/Products")
-// const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken')
 const Suppliers = require("../models/Suppliers")
 const bcrypt = require("bcrypt")
 
@@ -45,8 +45,33 @@ const login = async (req, res) => {
         representative_Name: foundSupplier.representative_Name,
         productsList: foundSupplier.productsList
     }
-    // const accessToken = jwt.sign(supplierInfo, process.env.ACCESS_TOKEN_SECRET)
-    res.status(201).json({companyName: supplierInfo.companyName,representative_Name: supplierInfo.representative_Name })
+    const accessToken = jwt.sign(supplierInfo, process.env.ACCESS_TOKEN_SECRET)
+    res.status(201).json({token: accessToken ,companyName: supplierInfo.companyName,representative_Name: supplierInfo.representative_Name })
 }
 
-module.exports = { login, register }
+const getSupplierProducts = async (req,res)=> {
+    const supplierId = req.supplier._id 
+
+    const supplierObject = await Suppliers.findById(supplierId).lean()
+    if(!supplierObject){
+        return res.status(404).json({ message: "invalid supplier" })
+    }
+    return res.status(200).json({supplierProducts: supplierObject.productsList})
+}
+
+const getSuppliersCompanies = async (req,res) => {
+    const suppliers = await Suppliers.find().lean()
+    if(!suppliers?.length)
+         return res.status(404).json({ message: "no suppliers found" })
+
+    return res.status(200).json([...new Set(suppliers.companyName)])
+}
+
+const getSuppliersNames = async (req,res) => {
+    const suppliers = await Suppliers.find().lean()
+    if(!suppliers?.length)
+         return res.status(404).json({ message: "no suppliers found" })
+    return res.status(200).json(suppliers.representative_Name)
+}
+
+module.exports = { login, register, getSupplierProducts, getSuppliersCompanies, getSuppliersNames }

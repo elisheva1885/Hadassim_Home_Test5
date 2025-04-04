@@ -22,7 +22,7 @@ import { useNavigate } from "react-router";
 import { setSupplierDetails } from '../Store/Slices/supplierDetailsSlice';
 import { setToken } from '../Store/Slices/tokenSlice';
 
-export const SuppliersLogin = () => {
+export const AdminLogin = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
     // const [products, setProducts] = useState({});
@@ -39,31 +39,30 @@ export const SuppliersLogin = () => {
     console.log("at the start of the compinent",products);
 
     const defaultValues = {
-        companyName: '',
-        representative_Name: '',
-        password: '',
+        Admin_Name: '',
+        Admin_Password: '',
     }
-    const goToSupplierOrders = ()=> {
-        navigate("/supplier/orders")
+    const goToHome = ()=> {
+        navigate("/admin/home")
     }
    
 
-    const loginSupplier = async (data) => {
+    const loginAdmin = async (data) => {
         try {
-            const res = await axios.post("http://localhost:8000/api/suppliers/auth/login", data)
+            const res = await axios.post("http://localhost:8000/api/auth/admin/login", data)
             if (res.status === 201) {
-                alert("supplier logined successfully")
+                alert("hello admin of the system")
                 console.log("res.data",res.data);
-                dispatch(setSupplierDetails(res.data))
                 dispatch(setToken(res.data.token))
-                console.log("after setting",supplierDetails);
-                goToSupplierOrders()
+                // dispatch(setSupplierDetails(res.data))
+                // console.log("after setting",supplierDetails);
+                goToHome()
 
             }
         }
         catch (error) {
-            if (error.status === 401) {
-                alert("Unauthorized")
+            if (error.status === 403) {
+                alert("No Access")
             }
             else if (error.status === 400) {
                 alert("all details reqired")
@@ -77,7 +76,7 @@ export const SuppliersLogin = () => {
     const { control, formState: { errors }, handleSubmit, reset } = useForm({ defaultValues });
 
     const onSubmit = (data) => {
-        loginSupplier(data)
+        loginAdmin(data)
         setFormData(data);
         setShowMessage(true);
         // reset();
@@ -118,70 +117,27 @@ export const SuppliersLogin = () => {
 
             <div className="flex justify-content-center">
                 <div className="card">
-                    <h5 className="text-center">Login</h5>
+                    <h5 className="text-center">Admin Login</h5>
                     <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="companyName" control={control} rules={{ required: 'companyName is required.' }} render={({ field, fieldState }) => (
+                                <Controller name="Admin_Name" control={control} rules={{ required: 'Admin_Name is required.' }} render={({ field, fieldState }) => (
                                     <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
                                 )} />
-                                <label htmlFor="companyName" className={classNames({ 'p-error': errors.companyName })}>companyName*</label>
+                                <label htmlFor="Admin_Name" className={classNames({ 'p-error': errors.Admin_Name })}>Admin_Name*</label>
                             </span>
-                            {getFormErrorMessage('companyName')}
+                            {getFormErrorMessage('Admin_Name')}
                         </div>
                         <div className="field">
                             <span className="p-float-label">
-                                <Controller name="representative_Name" control={control} rules={{ required: 'representative_Name is required.' }} render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                )} />
-                                <label htmlFor="representative_Name" className={classNames({ 'p-error': errors.representative_Name })}>representative_Name*</label>
-                            </span>
-                            {getFormErrorMessage('representative_Name')}
-                        </div>
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="password" control={control} rules={{ required: 'Password is required.' }} render={({ field, fieldState }) => (
+                                <Controller name="Admin_Password" control={control} rules={{ required: 'Admin_Password is required.' }} render={({ field, fieldState }) => (
                                     <Password id={field.name} {...field} toggleMask className={classNames({ 'p-invalid': fieldState.invalid })} header={passwordHeader}  />
                                 )} />
-                                <label htmlFor="password" className={classNames({ 'p-error': errors.password })}>Password*</label>
+                                <label htmlFor="Admin_Password" className={classNames({ 'p-error': errors.Admin_Password })}>Admin_Password*</label>
                             </span>
-                            {getFormErrorMessage('password')}
+                            {getFormErrorMessage('Admin_Password')}
                         </div>
-                        {/* <div className="field">
-                            <MultiSelect
-                                value={selectedItems}
-                                options={products}
-                                onChange={(e) => {
-                                    setSelectedItems(e.value);
-                                    setSelectAll(e.value.length === products.length);
-                                }}
-                                selectAll={selectAll}
-                                onSelectAll={(e) => {
-                                    setSelectedItems(e.checked ? [] : products?.map((product) => product.value));
-                                    setSelectAll(!e.checked);
-                                }}
-                                virtualScrollerOptions={{ itemSize: 43 }}
-                                maxSelectedLabels={3}
-                                placeholder="Select Items"
-                                className="w-full md:w-20rem"
-                            />
-
-                            <div className="card flex justify-content-center">
-                                <Button label="ToAddProduct" icon="pi pi-external-link" onClick={() => setVisible(true)} />
-                                <Dialog header="Header" visible={visible} style={{ width: '50vw' }} onHide={() => { if (!visible) return; setVisible(false); }}>
-                                    <p className="m-0">
-                                    <CreateProduct/>
-                                    </p>
-                                </Dialog>
-                            </div>
-                        </div> */}
-                        {/* <div className="field-checkbox">
-                            <Controller name="accept" control={control} rules={{ required: true }} render={({ field, fieldState }) => (
-                                <Checkbox inputId={field.name} onChange={(e) => field.onChange(e.checked)} checked={field.value} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                            )} />
-                            <label htmlFor="accept" className={classNames({ 'p-error': errors.accept })}>I agree to the terms and conditions*</label>
-                        </div> */}
-
+                     
                         <Button type="submit" label="Login" className="mt-2" />
                     </form>
                 </div>
@@ -190,4 +146,4 @@ export const SuppliersLogin = () => {
     );
 }
 
-export default SuppliersLogin
+export default AdminLogin
