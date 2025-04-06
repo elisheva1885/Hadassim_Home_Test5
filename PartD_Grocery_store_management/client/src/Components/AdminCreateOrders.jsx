@@ -5,16 +5,21 @@ import { InputNumber } from 'primereact/inputnumber';
 import { MultiSelect } from "primereact/multiselect";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
 import { useLocation } from "react-router";
+
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { InputSwitch } from 'primereact/inputswitch';
 
 const AdminCreateOrders = () => {
     const location = useLocation();
     const [supplierProducts, setSupplierProducts] = useState([]);
-    const [selectAll, setSelectAll] = useState(false);
-    const [selectedItems, setSelectedItems] = useState(null);
-    const [amount, setAmount] = useState(0);
-    const [value, setValue] = useState(0);
+    const [amount, setAmount] = useState(0);    
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [productList, setProductList] = useState([]);
     const { supplier } = location.state || {};
+    const {token} = useSelector((state) => state.token);
 
     const getProducts = async () => {
         // const { supplier } = location.state || {}; // Access the type from state
@@ -55,19 +60,24 @@ const AdminCreateOrders = () => {
                 alert(`you have to take a bigger amount, the minimum is ${product.minimum_quantity}`)
             }
             else {
+                const headers = {
+                    'Authorization': `Bearer ${token}`
+                };
                 const data = {
                     supplier: supplier._id, 
                     products: [{product: product._id ,amount: amount }]
                 }
                 console.log(data);
-                const res = await axios.post("http://localhost:8000/api/orders",data )
+                const res = await axios.post("http://localhost:8000/api/orders" ,data , {headers})
                 if(res.status===201){
                     alert("sucess")
                 }
             }
         }
         catch (error) {
-
+            if(error.status === 401){
+                alert('Unauthorized')
+            }
         }
     }
 
@@ -97,6 +107,26 @@ const AdminCreateOrders = () => {
         getProducts()
     }, []);
 
+
+    const addProduct = () => {
+        if (selectedProduct && amount > 0) {
+            setProductList(prev => [
+                ...prev,
+                {
+                    product: selectedProduct,
+                    amount: amount
+                }
+            ]);
+            setSelectedProduct(null);
+            setAmount(null);
+            setSupplierProducts(supplierProducts=> supplierProducts.filter(product=> product._id != selectedProduct._id))
+        }
+    };
+
+    // const onSubmit = () => {
+    //     console.log("Products to submit:", productList);
+    //     // כאן את יכולה לשלוח לשרת או לכל פעולה שתרצי
+    // };
     return (
         <>
             <br />  <br />  <br />  <br />
@@ -118,7 +148,7 @@ const AdminCreateOrders = () => {
                 placeholder="Select Items"
                 className="w-full md:w-20rem"
             /> */}
-            <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+            {/* <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
 
                 <div className="field">
                     <span className="p-float-label">
@@ -128,9 +158,9 @@ const AdminCreateOrders = () => {
                         <label htmlFor="product">Products</label>
                     </span>
                 </div>
-                <br />
+                <br /> */}
                 {/* <Button onClick={() => setAmount()} label="amounts" /> */}
-                <div>
+                {/* <div> */}
                     {/* {selectedItems?.map((s, index) => {
                     console.log(s);
                     return (
@@ -140,11 +170,69 @@ const AdminCreateOrders = () => {
                         </div>
                     );
                 })} */}
-                    <InputNumber value={amount} onValueChange={handleValueChange} showButtons />
+                    {/* <InputNumber value={amount} onValueChange={handleValueChange} showButtons />
                     <Button type="submit" label="Submit" className="mt-2" />
 
                 </div>
-            </form>
+            </form> */}
+
+
+            {/* <div className="card">
+            <div className="flex justify-content-center align-items-center mb-4 gap-2">
+                <InputSwitch inputId="input-rowclick" checked={rowClick} onChange={(e) => setRowClick(e.value)} />
+                <label htmlFor="input-rowclick">Row Click</label>
+            </div>
+            <DataTable value={products} selectionMode={rowClick ? null : 'checkbox'} selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)} dataKey="id" tableStyle={{ minWidth: '50rem' }}>
+                <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
+                <Column field="code" header="Code"></Column>
+                <Column field="name" header="Name"></Column>
+                <Column field="category" header="Category"></Column>
+                <Column field="quantity" header="Quantity"></Column>
+            </DataTable>
+        </div> */}
+
+
+
+        <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="field">
+                <span className="p-float-label">
+                    <Dropdown
+                        id="product"
+                        value={selectedProduct}
+                        onChange={(e) => setSelectedProduct(e.value)}
+                        options={supplierProducts || []}
+                        optionLabel="name"
+                        placeholder="בחר מוצר"
+                    />
+                    <label htmlFor="product">Product</label>
+                </span>
+            </div>
+
+            <div className="field mt-3">
+                <label htmlFor="amount">Amount</label>
+                <InputNumber
+                    id="amount"
+                    value={amount}
+                    onValueChange={(e) => setAmount(e.value)}
+                    showButtons
+                    min={1}
+                />
+            </div>
+
+            <Button type="button" label="Add To List" className="mt-2" onClick={addProduct} />
+
+            {/* הצגת רשימת המוצרים שנבחרו */}
+            <div className="mt-4">
+                <h4>מוצרים שנבחרו:</h4>
+                {productList.map((item, index) => (
+                    <div key={index} className="mb-2">
+                        {item.product.name} - amount: {item.amount}
+                    </div>
+                ))}
+            </div>
+
+            <Button type="submit" label="Create Order" className="mt-4" disabled={productList.length === 0}/>
+        </form>
         </>
     )
 }

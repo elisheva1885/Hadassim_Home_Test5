@@ -30,7 +30,7 @@ const AdminHome = () => {
     const [selectedItems, setSelectedItems] = useState(null);
     const [visible, setVisible] = useState(false);
     const [suppliers, setSuppliers] = useState([]);
-
+    const {token} = useSelector((state) => state.token);
     const { companies } = useSelector(state => state.companies)
     const { products } = useSelector(state => state.products)
     const dispatch = useDispatch()
@@ -108,7 +108,7 @@ const AdminHome = () => {
             <div className="form-demo">
                 <div className="flex justify-content-center">
                     <div className="card">
-                        <h5 className="text-center">Register</h5>
+                        <h5 className="text-center">Order</h5>
                         <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
                             <div className="field">
                                 {/* <MultiSelect

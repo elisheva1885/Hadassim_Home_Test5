@@ -12,11 +12,17 @@ const adminVerify = (req, res, next)=> {
             if(err){
                 return res.status(403).json({message: 'Forbidden'})
             }
-            req.Admin_Name = decoded
-            if(!Admin_Name){
-                return res.status(403).json({message: 'Access denied'})
+            if (decoded.Admin_Name === process.env.ADMIN_NAME) {
+                req.Admin_Name = decoded.Admin_Name;
+                next();
+            } else {
+                return res.status(403).json({ message: 'Access denied' });
             }
-            next()
+            // req.Admin_Name = decoded
+            // if(!Admin_Name == process.env.ADMIN_NAME){
+            //     return res.status(403).json({message: 'Access denied'})
+            // }
+            // next()
         }
     )
 }

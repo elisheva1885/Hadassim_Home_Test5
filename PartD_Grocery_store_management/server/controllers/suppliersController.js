@@ -85,7 +85,7 @@ const getSuppliersNamesByCompany = async (req,res) => {
 const getSupplierByProduct = async (req,res)=> {
     const {product_id}= req.params
     const product = await Products.findById(product_id).lean()
-    console.log(product);
+    // console.log(product);
     if (!product) {
         return res.status(400).json({ message: "all field are reqired" })
     }
