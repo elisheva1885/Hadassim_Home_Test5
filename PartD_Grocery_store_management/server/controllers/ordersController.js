@@ -1,7 +1,7 @@
 const Orders = require('../models/Orders')
 const Suppliers = require('../models/Suppliers')
 const supplierController = require("../controllers/suppliersController")
-//admin
+const messageController = require("../controllers/messageController")
 const createOrder = async (req,res) => {
     const {supplier, products} = req.body
     if(!supplier|| !products)
@@ -54,15 +54,16 @@ const updateOrderStatusSupplier = async (req,res)=> {
     if(!_id){
         return res.status(400).json({message: "error on updating status"})
     }
-    const order = await Orders.findById(_id).exec()
-   
+    const order = await Orders.findById(_id).exec() 
     if(!order)
         return res.status(404).json({ message: "no such order" })
     const supplierId = req.supplier._id 
     if(order.supplier!=supplierId){
         return res.status(403).json({message: "not allow to change status to this order"})
     }
-    order.status = "In progress"
+    if(order.status === "created"){
+        order.status = "In progress"
+    }
     const updatedOrder = await order.save()
     return res.status(201).json(updatedOrder)
 }
@@ -75,7 +76,15 @@ const updateOrderStatusAdmin = async (req,res)=> {
     const order = await Orders.findById(_id).exec()
     if(!order)
         return res.status(404).json({ message: "no such order" })
-    order.status = "Completed"
+    if(order.status=== "In progress"){
+        order.status = "Completed"
+    }
+    try{
+        const message = messageController.createMessage(order.supplier, order._id)
+    }
+    catch(error){
+        return res.status(400).json({message: "error on creating message"})
+    }
     const updatedOrder = await order.save()
     return res.status(201).json(updatedOrder)
 }

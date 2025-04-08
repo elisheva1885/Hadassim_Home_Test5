@@ -15,8 +15,8 @@ app.use("/api/suppliers", require("./routes/suppliersRoute"))
 app.use("/api/products", require("./routes/productsRoute"))
 app.use("/api/auth/admin", require("./routes/adminRoute"))
 app.use("/api/orders", require("./routes/ordersRouter"))
+app.use("/api/messages", require("./routes/messageRouter"))
 
- app.get("/", (req, res)=>{res.send("This is home page")})
 
 
  mongoose.connection.once('open',()=>{

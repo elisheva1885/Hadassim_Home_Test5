@@ -19,48 +19,44 @@ import CreateProduct from './CreateProduct';
 import { useDispatch, useSelector } from 'react-redux';
 import { setProducts } from '../Store/Slices/productsSlice';
 import { useNavigate } from "react-router";
-import { setSupplierDetails } from '../Store/Slices/supplierDetailsSlice';
 
 export const SuppliersRegister = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
-    // const [products, setProducts] = useState({});
-    const [selectAll, setSelectAll] = useState(false);
-    const [selectedItems, setSelectedItems] = useState(null);
     const [visible, setVisible] = useState(false);
-    // const productsContext = useContext(ProductsContext) 
-    // const products = productsContext.products
-    // const setProducts = productsContext.setProducts
-    const {products} = useSelector((state) => state.products);
-    // const {supplierDetails} = useSelector((state) => state.supplierDetails);
+    const { products } = useSelector((state) => state.products);
+    const [supplierProducts, setSupplierProducts] = useState([])
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    console.log("at the start of the compinent",products);
 
     const defaultValues = {
         companyName: '',
         phoneNumber: '',
         representative_Name: '',
         password: '',
-        productsList: selectedItems
+        productsList: supplierProducts
     }
-    const goToSupplierOrders = ()=> {
-        navigate("/orders")
+    const goToLogin = () => {
+        alert("To view your orders login to the system")
+        navigate("/suppliersLogin")
     }
-   
+
 
     const createSupplier = async (data) => {
         try {
-            console.log("selectedItems",selectedItems)
-            data.productsList = selectedItems
-            console.log("data",data)
-
+            setSupplierProducts(supplierProducts.map(supplierProduct => {
+                return supplierProduct = {
+                    _id: supplierProduct.value,
+                    name: supplierProduct.label,
+                    price: supplierProduct.price,
+                    minimum_quantity: supplierProduct.minimum_quantity
+                }
+            }))
+            data.productsList = supplierProducts
             const res = await axios.post("http://localhost:8000/api/suppliers/auth/register", data)
             if (res.status === 201) {
                 alert("supplier registered successfully")
-                dispatch(setSupplierDetails({companyName: res.data.companyName , representative_Name: res.data.representative_Name}))
-                // console.log("after seting",supplierDetails);
-                goToSupplierOrders()
+                goToLogin()
 
             }
         }
@@ -68,24 +64,26 @@ export const SuppliersRegister = () => {
             if (error.status === 409) {
                 alert("this supplier already exist")
             }
-            else if (error.status === 400) {
-                alert("all details reqired")
-            }
         }
     }
 
-   
+    const handleAddProduct = (newProduct) => {
+        setSupplierProducts((supplierProducts) => [...supplierProducts, newProduct]);  
+    };
 
     const { control, formState: { errors }, handleSubmit, reset } = useForm({ defaultValues });
 
     const onSubmit = (data) => {
+        if (supplierProducts.length === 0) {
+            alert("Please add at least one product.");
+            return;
+        }
         createSupplier(data)
         setFormData(data);
         setShowMessage(true);
-        // reset();
     };
 
-   
+
 
     const getFormErrorMessage = (name) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
@@ -106,97 +104,74 @@ export const SuppliersRegister = () => {
         </React.Fragment>
     );
     return (
+        <div style={{ paddingTop: '60px' }}>
 
-        <div className="form-demo">
-            <Dialog visible={showMessage} onHide={() => setShowMessage(false)} position="top" footer={dialogFooter} showHeader={false} breakpoints={{ '960px': '80vw' }} style={{ width: '30vw' }}>
-                <div className="flex justify-content-center flex-column pt-6 px-3">
-                    <i className="pi pi-check-circle" style={{ fontSize: '5rem', color: 'var(--green-500)' }}></i>
-                    <h5>Registration Successful!</h5>
-                    <p style={{ lineHeight: 1.5, textIndent: '1rem' }}>
-                        Your account is registered under name <b>{formData.name}</b> ; it'll be valid next 30 days without activation. Please check <b>{formData.email}</b> for activation instructions.
-                    </p>
-                </div>
-            </Dialog>
-
-            <div className="flex justify-content-center">
-                <div className="card">
-                    <h5 className="text-center">Register</h5>
-                    <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="companyName" control={control} rules={{ required: 'companyName is required.' }} render={({ field, fieldState }) => (
-                                    <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                )} />
-                                <label htmlFor="companyName" className={classNames({ 'p-error': errors.companyName })}>companyName*</label>
-                            </span>
-                            {getFormErrorMessage('companyName')}
-                        </div>
-                        <div className="field">
-                            <span className="p-float-label p-input-icon-right">
-                                <Controller name="phoneNumber" control={control} rules={{ required: 'phoneNumber is required.' }}
-                                    render={({ field, fieldState }) => (
-                                        <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
+            <div className="form-demo">
+                <div className="flex justify-content-center">
+                    <div className="card">
+                        <h5 className="text-center">Register</h5>
+                        <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+                            <div className="field">
+                                <span className="p-float-label">
+                                    <Controller name="companyName" control={control} rules={{ required: 'companyName is required.' }} render={({ field, fieldState }) => (
+                                        <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
                                     )} />
-                                <label htmlFor="phoneNumber" className={classNames({ 'p-error': errors.phoneNumber })}>phoneNumber*</label>
-                            </span>
-                            {getFormErrorMessage('phoneNumber')}
-                        </div>
-                        <div className="field">
-                            <span className="p-float-label p-input-icon-right">
-                                <Controller name="representative_Name" control={control} rules={{ required: 'representative_Name is required.' }}
-                                    render={({ field, fieldState }) => (
-                                        <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                                    )} />
-                                <label htmlFor="representative_Name" className={classNames({ 'p-error': !!errors.representative_Name })}>representative Name*</label>
-                            </span>
-                            {getFormErrorMessage('representative_Name')}
-                        </div>
-                        <div className="field">
-                            <span className="p-float-label">
-                                <Controller name="password" control={control} rules={{ required: 'Password is required.' }} render={({ field, fieldState }) => (
-                                    <Password id={field.name} {...field} toggleMask className={classNames({ 'p-invalid': fieldState.invalid })} header={passwordHeader} footer={passwordFooter} />
-                                )} />
-                                <label htmlFor="password" className={classNames({ 'p-error': errors.password })}>Password*</label>
-                            </span>
-                            {getFormErrorMessage('password')}
-                        </div>
-                        <div className="field">
-                            <MultiSelect
-                                value={selectedItems}
-                                options={products}
-                                onChange={(e) => {
-                                    setSelectedItems(e.value);
-                                    setSelectAll(e.value.length === products.length);
-                                }}
-                                selectAll={selectAll}
-                                onSelectAll={(e) => {
-                                    setSelectedItems(e.checked ? [] : products?.map((product) => product.value));
-                                    setSelectAll(!e.checked);
-                                }}
-                                virtualScrollerOptions={{ itemSize: 43 }}
-                                maxSelectedLabels={3}
-                                placeholder="Select Items"
-                                className="w-full md:w-20rem"
-                            />
-
-                            <div className="card flex justify-content-center">
-                                <Button label="ToAddProduct" icon="pi pi-external-link" onClick={() => setVisible(true)} />
-                                <Dialog header="Header" visible={visible} style={{ width: '50vw' }} onHide={() => { if (!visible) return; setVisible(false); }}>
-                                    <p className="m-0">
-                                    <CreateProduct/>
-                                    </p>
-                                </Dialog>
+                                    <label htmlFor="companyName" className={classNames({ 'p-error': errors.companyName })}>companyName*</label>
+                                </span>
+                                {getFormErrorMessage('companyName')}
                             </div>
-                        </div>
-                        <div className="field-checkbox">
-                            <Controller name="accept" control={control} rules={{ required: true }} render={({ field, fieldState }) => (
-                                <Checkbox inputId={field.name} onChange={(e) => field.onChange(e.checked)} checked={field.value} className={classNames({ 'p-invalid': fieldState.invalid })} />
-                            )} />
-                            <label htmlFor="accept" className={classNames({ 'p-error': errors.accept })}>I agree to the terms and conditions*</label>
-                        </div>
-
-                        <Button type="submit" label="Submit" className="mt-2" />
-                    </form>
+                            <div className="field">
+                                <span className="p-float-label p-input-icon-right">
+                                    <Controller name="phoneNumber" control={control} rules={{ required: 'phoneNumber is required.' }}
+                                        render={({ field, fieldState }) => (
+                                            <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
+                                        )} />
+                                    <label htmlFor="phoneNumber" className={classNames({ 'p-error': errors.phoneNumber })}>phoneNumber*</label>
+                                </span>
+                                {getFormErrorMessage('phoneNumber')}
+                            </div>
+                            <div className="field">
+                                <span className="p-float-label p-input-icon-right">
+                                    <Controller name="representative_Name" control={control} rules={{ required: 'representative_Name is required.' }}
+                                        render={({ field, fieldState }) => (
+                                            <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
+                                        )} />
+                                    <label htmlFor="representative_Name" className={classNames({ 'p-error': !!errors.representative_Name })}>representative Name*</label>
+                                </span>
+                                {getFormErrorMessage('representative_Name')}
+                            </div>
+                            <div className="field">
+                                <span className="p-float-label">
+                                    <Controller name="password" control={control} rules={{ required: 'Password is required.' }} render={({ field, fieldState }) => (
+                                        <Password id={field.name} {...field} toggleMask className={classNames({ 'p-invalid': fieldState.invalid })} header={passwordHeader} footer={passwordFooter} />
+                                    )} />
+                                    <label htmlFor="password" className={classNames({ 'p-error': errors.password })}>Password*</label>
+                                </span>
+                                {getFormErrorMessage('password')}
+                            </div>
+                            <div className="field">
+                                <div className="card flex justify-content-center">
+                                    <Button type="button" label="add your products" icon="pi pi-external-link" onClick={() => setVisible(true)} />
+                                    <Dialog header="Header" visible={visible} style={{ width: '50vw' }} onHide={() => { if (!visible) return; setVisible(false); }}>
+                                        <p className="m-0">
+                                            <CreateProduct onAddProduct={handleAddProduct} />
+                                        </p>
+                                    </Dialog>
+                                </div>
+                                <h3>Product List:</h3>
+                                <div className="product-list">
+                                    {supplierProducts.map((product, index) => (
+                                        <div className="product-card" key={index}>
+                                            <h4>{product.label}</h4>
+                                            <p><strong>Price:</strong> ₪ {product.price}</p>
+                                            <p><strong>Minimum Quantity:</strong> {product.minimum_quantity}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <Button type="submit" label="Register" className="mt-2" />
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

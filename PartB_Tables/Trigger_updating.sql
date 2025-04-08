@@ -36,6 +36,15 @@ BEGIN
 			ON p.Spouѕe_Id = i.[Ρerson_Id] 
 			WHERE i.Spouѕe_Id IS NULL
 
+		    INSERT INTO dbo.Connection_tbl(Ρerson_Id, Relative_Id, Connection_Type)
+			SELECT p.Ρerson_Id, i.Ρerson_Id, 'spouse'
+			FROM inserted i
+			JOIN dbo.Person_tbl p ON p.Spouѕe_Id = i.Ρerson_Id
+			WHERE NOT EXISTS (
+				SELECT 1
+				FROM dbo.Connection_tbl c
+				WHERE c.Ρerson_Id = p.Ρerson_Id AND c.Relative_Id = i.Ρerson_Id AND c.Connection_Type = 'spouse'
+			);
 
 		--WHERE EXISTS (
   --      SELECT 1 FROM dbo.Person_tbl person WHERE person.[Ρerson_Id] = i.[Ρerson_Id]

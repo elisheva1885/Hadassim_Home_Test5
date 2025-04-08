@@ -11,6 +11,8 @@ AFTER INSERT
 		SELECT Fathеr_Id ,[Ρerson_Id] , 'Father'
 		FROM inserted i
 		WHERE i.Fathеr_Id IS NOT NULL;
+		--JOIN dbo.Person_tbl p ON i.Father_Id = p.Person_Id
+		--WHERE p.Gender <> 'M'
 
 		--WHERE EXISTS (
   --      SELECT 1 FROM dbo.Person_tbl person WHERE person.[Ρerson_Id] = i.[Ρerson_Id]

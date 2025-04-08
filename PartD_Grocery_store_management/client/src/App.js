@@ -3,6 +3,8 @@ import './App.css';
 import SuppliersRegister from './Components/SuppliersRegister';
 import { useState } from 'react';
 import Home from './Components/Home';
+import Navber from './Components/Navber';
+import Navbar from './Components/Navber';
 function App() {
 
 //   const getProducts = async () => {
@@ -27,7 +29,7 @@ function App() {
   return (
     
     <div className="App">
-     <Home/>
+     <Navbar/>
     </div>
   );
 }

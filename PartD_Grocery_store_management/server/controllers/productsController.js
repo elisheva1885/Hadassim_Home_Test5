@@ -5,9 +5,9 @@ const createProduct = async (req,res) => {
     if(!name|| !price|| !minimum_quantity)
         return res.status(400).json({ message: "all details are required" })
     
-    const duplicate = await Products.findOne({name: name}).lean()
+    const duplicate = await Products.findOne({"name": name,"price": price}).lean()
     if (duplicate) 
-        return res.status(409).json({ message: "this product already exist" })
+        return res.status(409).json({ message: "this product already exist in this price" })
     
     const product = await Products.create({name, price, minimum_quantity})
     if(product)

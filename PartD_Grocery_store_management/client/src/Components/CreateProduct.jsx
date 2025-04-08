@@ -1,15 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
-import { Dropdown } from 'primereact/dropdown';
-import { Calendar } from 'primereact/calendar';
-import { Password } from 'primereact/password';
-import { Checkbox } from 'primereact/checkbox';
-import { Dialog } from 'primereact/dialog';
-import { Divider } from 'primereact/divider';
 import { classNames } from 'primereact/utils';
-import { MultiSelect } from 'primereact/multiselect';
 import '../FormDemo.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.min.css';
@@ -19,15 +12,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setProducts } from '../Store/Slices/productsSlice';
 
 
-const CreateProduct = () => {
+const CreateProduct = ({onAddProduct}) => {
     const [showMessage, setShowMessage] = useState(false);
-    const [formData, setFormData] = useState({});
-    const [selectAll, setSelectAll] = useState(false);
-    const [selectedItems, setSelectedItems] = useState(null);
-    const [visible, setVisible] = useState(false);
-    // const productsContext = useContext(ProductsContext) 
-    // const products = productsContext.products
-    // const setProducts = productsContext.setProducts 
     const {products} = useSelector((state) => state.products);
     const dispatch = useDispatch();
     console.log("at the start of the compinent", products);
@@ -37,32 +23,20 @@ const CreateProduct = () => {
         minimum_quantity: ''
     }
 
-    // const getProducts = async () => {
-    //     try {
-    //         const res = await axios.get('http://localhost:8000/api/products')
-    //         if (res.status === 200) {
-    //             // setProducts((res.data))
-    //             // setProducts(Array.from(res.data).map((product) => ({ label: product.name, value: product._id })))
-    //             setProducts((res.data).map((product) => ({ label: product.name, value: product._id })))
-    //             console.log("SuppliersRegister", products);
-    //         }
-    //     }
-    //     catch (error) {
-    //         if (error.status === 404)
-    //             alert("no products you welcome to add")
-    //     }
-    // }
 
     const createProduct = async (data) => {
         try {
             const res = await axios.post("http://localhost:8000/api/products", data)
             if (res.status === 201) {
                 alert("product added successfully")
-                dispatch(setProducts([...products,{ label: res.data.name, value: res.data._id }]))
-                console.log("after adding",products);
-                // ProductsProvider.setProducts(ProductsProvider.products.push(res.data))
-                // console.log(ProductsProvider);
-
+                dispatch(setProducts([...products,{ label: res.data.name, value: res.data._id , price: res.data.price , minimum_quantity: res.data.minimum_quantity}]))
+                const newProduct = {
+                    name: res.data.name,
+                    _id: res.data._id ,
+                    price: res.data.price,
+                    minimum_quantity: res.data.minimum_quantity
+                };
+                onAddProduct(newProduct);  
             }
         }
         catch (error) {
@@ -78,11 +52,8 @@ const CreateProduct = () => {
 
     const { control, formState: { errors }, handleSubmit, reset } = useForm({ defaultValues });
 
-    const onSubmit = (data) => {
+    const onsubmit = (data) => {
         createProduct(data)
-        // setFormData(data);
-        // setShowMessage(true);
-
         reset();
     };
 
@@ -95,7 +66,8 @@ const CreateProduct = () => {
     const dialogFooter = <div className="flex justify-content-center"><Button label="OK" className="p-button-text" autoFocus onClick={() => setShowMessage(false)} /></div>;
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+        <div style={{ paddingTop: '60px' }}>
+        <form onSubmit={handleSubmit(onsubmit)} className="p-fluid">
             <div className="field">
                 <span className="p-float-label">
                     <Controller name="name" control={control} rules={{ required: 'name is required.' }} render={({ field, fieldState }) => (
@@ -130,6 +102,7 @@ const CreateProduct = () => {
             <br />
             <Button type="submit" label="Submit" className="mt-2" />
         </form>
+        </div>
     )
 }
 export default CreateProduct

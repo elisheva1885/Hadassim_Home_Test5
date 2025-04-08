@@ -25,28 +25,17 @@ import { useNavigate } from "react-router";
 const AdminHome = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
-    // const [products, setProducts] = useState({});
-    const [selectAll, setSelectAll] = useState(false);
-    const [selectedItems, setSelectedItems] = useState(null);
     const [visible, setVisible] = useState(false);
     const [suppliers, setSuppliers] = useState([]);
-    const {token} = useSelector((state) => state.token);
-    const { companies } = useSelector(state => state.companies)
+    // const { companies } = useSelector(state => state.companies)
     const { products } = useSelector(state => state.products)
-    const dispatch = useDispatch()
     const navigate = useNavigate()
-    // const goToOrder = () => {
-    //     const navigationData = {
-    //         supplier: suppliers,
-    //     };
-    //     navigate('/admin/order', { state: navigationData })
-    // }
 
-    const SupplierToSend = (supplier)=> {
+    const SupplierToSend = (supplier) => {
         const navigationData = {
             supplier: supplier,
         };
-        navigate('/admin/order', { state: navigationData })
+        navigate('/admin/createOrder', { state: navigationData })
     }
 
     const defaultValues = {
@@ -56,11 +45,9 @@ const AdminHome = () => {
     const { control, formState: { errors }, handleSubmit, reset } = useForm({ defaultValues });
 
     const onSubmit = (data) => {
-        // createSupplier(data)
         getSupplierByProduct(data.product)
         setFormData(data);
         setShowMessage(true);
-        // reset();
     };
 
     const getSupplierByProduct = async (data) => {
@@ -70,7 +57,6 @@ const AdminHome = () => {
             if (res.status === 200) {
                 setSuppliers(res.data)
                 console.log("SuppliersRegister", res.data);
-                // goToOrder()
             }
         }
         catch (error) {
@@ -80,31 +66,45 @@ const AdminHome = () => {
     }
 
 
-    const getCompanies = async () => {
-        try {
-            const res = await axios.get("http://localhost:8000/api/suppliers")
-            if (res.status === 200) {
-                dispatch(setCompanies(res.data))
-                console.log("res.data", res.data);
-                console.log("companies", companies);
-            }
-        }
-        catch (error) {
-            if (error.status === 404) {
-                alert("not found")
-            }
-            else if (error.status === 400) {
-                alert("all details reqired")
-            }
-        }
-    }
-    const dialogFooter = <div className="flex justify-content-center"><Button label="OK" className="p-button-text" autoFocus onClick={() => setShowMessage(false)} /></div>;
+    // const getCompanies = async () => {
+    //     try {
+    //         const res = await axios.get("http://localhost:8000/api/suppliers")
+    //         if (res.status === 200) {
+    //             dispatch(setCompanies(res.data))
+    //             console.log("res.data", res.data);
+    //             console.log("companies", companies);
+    //         }
+    //     }
+    //     catch (error) {
+    //         if (error.status === 404) {
+    //             alert("not found")
+    //         }
+    //         else if (error.status === 400) {
+    //             alert("all details reqired")
+    //         }
+    //     }
+    // }
+    // const dialogFooter = <div className="flex justify-content-center"><Button label="OK" className="p-button-text" autoFocus onClick={() => setShowMessage(false)} /></div>;
 
-    useEffect(() => {
-        getCompanies()
-    }, []);
+
+    // useEffect(() => {
+    //     getCompanies()
+    // }, []);
     return (
         <>
+            <div style={{ paddingTop: '60px' }}>
+                <h2> Hello Admin! </h2>
+                <br />
+                <p> To make the ordering process as convenient as possible, please follow these steps:
+                    <br />
+                    Select the product you wish to order.
+                    <br />
+                    Choose your preferred supplier for the product.
+                    <br />
+                    Select the products and quantities from the available options offered by the selected supplier.
+                    <br />
+                </p>
+            </div>
             <div className="form-demo">
                 <div className="flex justify-content-center">
                     <div className="card">
@@ -131,20 +131,22 @@ const AdminHome = () => {
                                 <div className="field">
                                     <span className="p-float-label">
                                         <Controller name="product" control={control} render={({ field }) => (
-                                            <Dropdown id={field.label} value={field.value} onChange={(e) => field.onChange(e.value)} options={products ? products : []} optionLabel="label" />
+                                            <Dropdown id={field.label} value={field.value} onChange={(e) => field.onChange(e.value)} options={products ? products : []} optionLabel="label" itemTemplate={(item) => (
+                                                <div>
+                                                    <span>{item.label}</span> <span style={{ fontWeight: 'bold' }}>-  ₪ {item.price}</span>
+                                                </div>
+                                            )} />
                                         )} />
                                         <label htmlFor="product">Products</label>
                                     </span>
                                 </div>
                             </div>
 
-                            <Button type="submit" label="Submit" className="mt-2" />
-
                             <div className="card flex justify-content-center">
                                 <Button label="Get Supplier of this product" icon="pi pi-external-link" onClick={() => { setVisible(true) }} />
                                 <Dialog header="Header" visible={visible} style={{ width: '50vw' }} onHide={() => { if (!visible) return; setVisible(false); }}>
                                     <p className="m-0">
-                                        {suppliers?.map((supplier)=> {<>{supplier.companyName}, {supplier.representative_Name}</>})}
+                                        {suppliers?.map((supplier) => { <>{supplier.companyName}, {supplier.representative_Name}</> })}
                                     </p>
                                     <p className="m-0">
                                         {suppliers?.map((supplier) => `${supplier.companyName} - ${supplier.representative_Name}`).join(', ')}
@@ -158,7 +160,7 @@ const AdminHome = () => {
                                                 key={index}
                                                 label={`${supplier.companyName} - ${supplier.representative_Name}`}
                                                 className="p-button p-button-text p-mb-2"
-                                                onClick={()=>SupplierToSend(supplier)}// Optional: handle button click event
+                                                onClick={() => SupplierToSend(supplier)}// Optional: handle button click event
                                             />
                                         ))}
                                     </div>

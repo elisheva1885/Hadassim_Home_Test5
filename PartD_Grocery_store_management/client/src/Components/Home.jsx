@@ -1,6 +1,6 @@
 import { Link, Route, Router, Routes } from "react-router"
-import { Button } from "primereact/button"
-import { Suspense, lazy, useEffect } from "react"
+import {} from "primereact/button"
+import {  lazy, useEffect } from "react"
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setProducts } from "../Store/Slices/productsSlice";
@@ -20,7 +20,8 @@ const Home = () => {
         try {
             const res = await axios.get('http://localhost:8000/api/products')
             if (res.status === 200) {
-                dispatch(setProducts((res.data).map((product) => ({ label: product.name, value: product._id }))))
+                dispatch(setProducts((res.data).map((product) => ({ label: product.name, value: product._id , price: product.price }))))
+                console.log(res.data);
             }
         }
         catch (error) {
@@ -35,12 +36,12 @@ const Home = () => {
     }, []);
 return(
 <>
-    <Link to={'/suppliersRegister'}>to Register</Link>
+    {/* <Link to={'/suppliersRegister'}>to Register</Link>
     <Link to={'/suppliersLogin'}>to Login</Link>
     <Link to={'/adminLogin'}>Admin</Link>
     {/* <Link to={'/admin/home'}>Admin</Link> */}
 
-    <Routes>
+    {/* <Routes>
     <Route path='/suppliersRegister' element={<Suspense fallback="Loading..."><SuppliersRegister /></Suspense>}></Route>
     <Route path='/suppliersLogin' element={<Suspense fallback="Loading..."><SuppliersLogin /></Suspense>}></Route>
     <Route path='/supplier/orders' element={<Suspense fallback="Loading..."><SupplierOrders /></Suspense>}></Route>
@@ -48,7 +49,7 @@ return(
     <Route path='/admin/home' element={<Suspense fallback="Loading..."><AdminHome /></Suspense>}></Route>
     <Route path='/admin/order' element={<Suspense fallback="Loading..."><AdminCreateOrders /></Suspense>}></Route>
 
-    </Routes>
+    </Routes>  */}
     </>
     )
 }

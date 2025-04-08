@@ -58,10 +58,8 @@ const getSupplierProducts = async (supplier)=> {
     const supplierObject = await Suppliers.findById(supplier).lean()
     if(!supplierObject){
         throw new Error("invalid supplier");
-        // return res.status(404).json({ message: "invalid supplier" })
     }
     return supplierObject.productsList
-    // return res.status(200).json({supplierProducts: supplierObject.productsList})
 }
 
 const getSuppliersCompanies = async (req,res) => {
