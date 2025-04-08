@@ -15,7 +15,6 @@ const AdminExistsOrders = () => {
             const headers = {
                 'Authorization': `Bearer ${token}`
             };
-            console.log(token);
 
             const res = await axios.get(`http://localhost:8000/api/orders`, { headers })
             if (res.status === 200) {
@@ -69,8 +68,6 @@ const AdminExistsOrders = () => {
     const ordersCards = () => {
         return orders?.map(order => {
             const orderProducts = order.products
-            console.log(orderProducts);
-
             const productAndAmount = orderProducts?.map(orderProduct => {
                 const product = products?.find(product => product.value === orderProduct.product);
                 return {
@@ -82,19 +79,19 @@ const AdminExistsOrders = () => {
             const cardContainerStyle = {
                 display: 'flex',
                 justifyContent: 'center',
-                alignItems: 'flex-start', // changed from center
-                flexWrap: 'wrap',         // allows multiple cards in a row
-                gap: '10px',              // space between cards
-                padding: '10px',          // optional, for breathing room
+                alignItems: 'flex-start', 
+                flexWrap: 'wrap',        
+                gap: '10px',            
+                padding: '10px',         
             };
 
             const cardStyle = {
-                width: '25%', // Set small width
-                padding: '5px', // Add padding for content
-                border: '1px solid #ccc', // Add a simple border
-                borderRadius: '8px', // Optional: rounded corners
-                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', // Optional: soft shadow effect
-                backgroundColor: '#fff', // White background
+                width: '25%', 
+                padding: '5px', 
+                border: '1px solid #ccc', 
+                borderRadius: '8px', 
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', 
+                backgroundColor: '#fff', 
             };
 
             return (

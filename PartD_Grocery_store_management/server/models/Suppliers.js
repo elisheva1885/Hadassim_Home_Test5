@@ -18,7 +18,7 @@ const suppliersSchema = new mongoose.Schema({
     },
     productsList: {
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Products' }],
-        reqired: true,
+        required: true,
     }   
 }, {
     timestamps: true

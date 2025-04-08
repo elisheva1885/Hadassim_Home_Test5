@@ -23,8 +23,6 @@ import { setToken } from '../Store/Slices/tokenSlice';
 export const AdminLogin = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
-
-    // const {products} = useSelector((state) => state.products);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 

@@ -8,11 +8,11 @@ const ordersSchema = new mongoose.Schema({
     products: {
         type: [ 
             {
-                product:{ type: mongoose.Schema.Types.ObjectId, ref: 'Products' , reqired: true},
-                amount:{type:Number , reqired: true}
+                product:{ type: mongoose.Schema.Types.ObjectId, ref: 'Products' , required: true},
+                amount:{type:Number , required: true}
             }
             ],
-            reqired: true
+            required: true
     },
     status: {
         type: String, 

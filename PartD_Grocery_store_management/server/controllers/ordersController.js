@@ -2,6 +2,9 @@ const Orders = require('../models/Orders')
 const Suppliers = require('../models/Suppliers')
 const supplierController = require("../controllers/suppliersController")
 const messageController = require("../controllers/messageController")
+const Products = require('../models/Products')
+const StoreProducts = require('../models/storeProducts')
+const storeProducts = require('../models/storeProducts')
 const createOrder = async (req,res) => {
     const {supplier, products} = req.body
     if(!supplier|| !products)
@@ -73,14 +76,29 @@ const updateOrderStatusAdmin = async (req,res)=> {
     if(!_id){
         return res.status(400).json({message: "error on updating status"})
     }
-    const order = await Orders.findById(_id).exec()
+    const order = await Orders.findById(_id).populate('products.product', 'name').exec();
+
     if(!order)
         return res.status(404).json({ message: "no such order" })
     if(order.status=== "In progress"){
         order.status = "Completed"
     }
+
+    await Promise.all(order.products.map(async (item) => {
+        const productName = item.product.name; 
+        const orderAmount = item.amount; 
+
+        const storeProduct = await storeProducts.findOne({ name: productName }).exec();
+
+        if (storeProduct) {
+            storeProduct.current_quantity += orderAmount
+            storeProduct.ordered =false
+                await storeProduct.save();
+
+        }}));
+
     try{
-        const message = messageController.createMessage(order.supplier, order._id)
+        const message = await messageController.createMessage(order.supplier, order._id)
     }
     catch(error){
         return res.status(400).json({message: "error on creating message"})
@@ -89,6 +107,35 @@ const updateOrderStatusAdmin = async (req,res)=> {
     return res.status(201).json(updatedOrder)
 }
 
-module.exports = {createOrder, readAllOrdersAdmin, readOrdersStatusAdmin , readOrdersBySupplier , updateOrderStatusAdmin, updateOrderStatusSupplier}
+const createOrderByProduct = async (productName) => {
+    if (!productName) {
+        return { error: "productName is required" }; 
+    }
+
+    const products = await Products.find({ name: productName }).lean();
+    if (products.length === 0) {
+        return { error: "No supplier has this product" }; 
+    }
+
+    const productWithMinPrice = products.sort((a, b) => a.price - b.price)[0];
+    const productSupplier = await supplierController.getProductSupplier(productWithMinPrice._id);
+
+    const product = [
+        {
+            product: productWithMinPrice._id,
+            amount: productWithMinPrice.minimum_quantity + 1
+        }
+    ];
+
+    const supplier = productSupplier._id;
+    const order = await Orders.create({ supplier, products: product });
+
+    if (!order) {
+        return { error: "Invalid order" }; 
+    }
+
+    return { order }; 
+};
+module.exports = {createOrder, readAllOrdersAdmin, readOrdersStatusAdmin , readOrdersBySupplier , updateOrderStatusAdmin, updateOrderStatusSupplier, createOrderByProduct}
 
 

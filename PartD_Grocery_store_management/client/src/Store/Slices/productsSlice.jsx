@@ -11,9 +11,6 @@ const productsSlice = createSlice({
         setProducts:(state,action)=>{
             state.products=action.payload
         },
-        // clearBasket(state) {
-        //     state.basket = null;
-        // }
     }
 })
 

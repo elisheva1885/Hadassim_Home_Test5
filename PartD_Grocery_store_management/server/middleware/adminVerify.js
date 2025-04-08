@@ -18,11 +18,6 @@ const adminVerify = (req, res, next)=> {
             } else {
                 return res.status(403).json({ message: 'Access denied' });
             }
-            // req.Admin_Name = decoded
-            // if(!Admin_Name == process.env.ADMIN_NAME){
-            //     return res.status(403).json({message: 'Access denied'})
-            // }
-            // next()
         }
     )
 }

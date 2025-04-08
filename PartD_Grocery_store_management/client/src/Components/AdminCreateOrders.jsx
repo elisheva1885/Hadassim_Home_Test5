@@ -26,9 +26,7 @@ const AdminCreateOrders = () => {
             const newProducts = responses
                 .filter(res => res.status === 200)
                 .map(res => res.data);
-            console.log(newProducts);
             setSupplierProducts(newProducts);
-            console.log("sup", supplierProducts);
         }
         catch (error) {
             console.error(error)
@@ -64,11 +62,6 @@ const AdminCreateOrders = () => {
         createOrder()
     };
 
-    // const handleValueChange = (e) => {
-    //     setAmount(e.value);
-  
-    // };
-
     const defaultValues = {
         product: ''
     }
@@ -91,7 +84,6 @@ const AdminCreateOrders = () => {
                 setSelectedProduct(null);
                 setAmount(null);
                 setSupplierProducts(supplierProducts => supplierProducts.filter(product => product._id != selectedProduct._id))
-                console.log(productList);
             }
         }
     };

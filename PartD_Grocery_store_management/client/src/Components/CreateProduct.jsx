@@ -16,7 +16,6 @@ const CreateProduct = ({onAddProduct}) => {
     const [showMessage, setShowMessage] = useState(false);
     const {products} = useSelector((state) => state.products);
     const dispatch = useDispatch();
-    console.log("at the start of the compinent", products);
     const defaultValues = {
         name: '',
         price: '',
@@ -63,7 +62,6 @@ const CreateProduct = ({onAddProduct}) => {
         return errors[name] && <small className="p-error">{errors[name].message}</small>
     };
 
-    const dialogFooter = <div className="flex justify-content-center"><Button label="OK" className="p-button-text" autoFocus onClick={() => setShowMessage(false)} /></div>;
 
     return (
         <div style={{ paddingTop: '60px' }}>

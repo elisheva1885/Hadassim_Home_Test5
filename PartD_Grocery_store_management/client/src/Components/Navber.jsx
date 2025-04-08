@@ -10,10 +10,11 @@ const SupplierOrders = lazy(() => import('./SupplierOrders'));
 const AdminLogin = lazy(() => import('./AdminLogin'));
 const AdminHome = lazy(() => import('./AdminHome'));
 const AdminCreateOrders = lazy(() => import('./AdminCreateOrders'));
-const Home = lazy(() => import('./Home'));
 const AdminOrders = lazy(() => import('./AdminOrders'));
 const AdminNavigate = lazy(() => import('./AdminNavigate'));
 const AdminExistsOrders = lazy(() => import('./AdminExistsOrders'));
+const Checkout = lazy(() => import('./Checkout'));
+
 
 const Navbar = () => {
 
@@ -53,13 +54,22 @@ const Navbar = () => {
             label: 'Admin login',
             icon: 'pi pi-star',
             command: () => navigate('/adminLogin')
+        },
+        {
+            label: 'Admin options',
+            icon: 'pi pi-star',
+            command: () => navigate('/admin/navigate')
+        },
+        {
+            label: 'Checkout',
+            icon: 'pi pi-shopping-cart',
+            command: () => navigate('/checkout')
         }
     ];
 
     return (
         <>
             <Routes>
-                <Route path='/' element={<Suspense fallback="Loading..."><Home /></Suspense>}></Route>
                 <Route path='/suppliersRegister' element={<Suspense fallback="Loading..."><SuppliersRegister /></Suspense>}></Route>
                 <Route path='/suppliersLogin' element={<Suspense fallback="Loading..."><SuppliersLogin /></Suspense>}></Route>
                 <Route path='/supplier/orders' element={<Suspense fallback="Loading..."><SupplierOrders /></Suspense>}></Route>
@@ -69,6 +79,8 @@ const Navbar = () => {
                 <Route path='/admin/view/orders' element={<Suspense fallback="Loading..."><AdminOrders /></Suspense>}></Route>
                 <Route path='/admin/view/existingOrders' element={<Suspense fallback="Loading..."><AdminExistsOrders /></Suspense>}></Route>
                 <Route path='/admin/navigate' element={<Suspense fallback="Loading..."><AdminNavigate /></Suspense>}></Route>
+                <Route path='/checkout' element={<Suspense fallback="Loading..."><Checkout /></Suspense>}></Route>
+
             </Routes>
 
             <div className="card">

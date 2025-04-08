@@ -50,11 +50,9 @@ const login = async (req, res) => {
 }
 
 const getSupplierProducts = async (supplier)=> {
-
     if (!supplier) {
         throw new Error("Supplier data is missing");
     }  
-    console.log(supplier);
     const supplierObject = await Suppliers.findById(supplier).lean()
     if(!supplierObject){
         throw new Error("invalid supplier");
@@ -83,7 +81,6 @@ const getSuppliersNamesByCompany = async (req,res) => {
 const getSupplierByProduct = async (req,res)=> {
     const {product_id}= req.params
     const product = await Products.findById(product_id).lean()
-    // console.log(product);
     if (!product) {
         return res.status(400).json({ message: "all field are reqired" })
     }
@@ -97,4 +94,13 @@ const getSupplierByProduct = async (req,res)=> {
     return res.status(200).json(productSuppliers)
 }
 
-module.exports = { login, register, getSupplierProducts, getSuppliersCompanies, getSuppliersNamesByCompany , getSupplierByProduct}
+
+const getProductSupplier = async (product_id) => {
+    const supplier = await Suppliers.findOne({ productsList: product_id }).populate('productsList');
+    if(!supplier){
+        throw new Error("no supplier for this product");
+    }
+    return supplier
+}
+
+module.exports = { login, register, getSupplierProducts, getSuppliersCompanies, getSuppliersNamesByCompany , getSupplierByProduct , getProductSupplier}

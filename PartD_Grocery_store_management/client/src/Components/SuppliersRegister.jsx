@@ -16,17 +16,13 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import axios from 'axios'
 import CreateProduct from './CreateProduct';
-import { useDispatch, useSelector } from 'react-redux';
-import { setProducts } from '../Store/Slices/productsSlice';
 import { useNavigate } from "react-router";
 
 export const SuppliersRegister = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
     const [visible, setVisible] = useState(false);
-    const { products } = useSelector((state) => state.products);
     const [supplierProducts, setSupplierProducts] = useState([])
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const defaultValues = {
