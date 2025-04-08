@@ -10,11 +10,6 @@ INSERT INTO dbo.Person_tbl(Ρerson_Id , [Person_Name] , Family_Name , Gender , F
 VALUES (2,'אסתר','ספראי', 'F',NULL , NULL,1)
 
 
---UPDATE dbo.Person_tbl
---SET Spouѕe_Id = 1
---WHERE Ρerson_Id = 2;
-
-
 INSERT INTO dbo.Person_tbl(Ρerson_Id , [Person_Name] , Family_Name , Gender , Fathеr_Id , Mother_Id , Spouѕe_Id)
 VALUES (3,'זאב','קופלוביץ', 'M',NULL , NULL,4)
 
@@ -39,14 +34,18 @@ VALUES (8,'יוכבד','אייכנטל', 'M',NULL , NULL,NULL)
 INSERT INTO dbo.Person_tbl(Ρerson_Id , [Person_Name] , Family_Name , Gender , Fathеr_Id , Mother_Id , Spouѕe_Id)
 VALUES (9,'אהרון','ספראי', 'M',5 , 6,10)
 
+INSERT INTO dbo.Person_tbl(Ρerson_Id , [Person_Name] , Family_Name , Gender , Fathеr_Id , Mother_Id , Spouѕe_Id)
+VALUES (11,'פנינה','ספראי', 'M',5 , 6,NULL)
 
 UPDATE dbo.Person_tbl
 SET Gender = 'F'
 WHERE Ρerson_Id = 8
-
+UPDATE dbo.Person_tbl
+SET Gender = 'F'
+WHERE Ρerson_Id = 11
 
 UPDATE dbo.Person_tbl
 SET Mother_Id = 2
-WHERE Ρerson_Id = 7
+WHERE Ρerson_Id = 6
 
 

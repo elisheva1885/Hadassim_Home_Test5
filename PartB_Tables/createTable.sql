@@ -20,8 +20,7 @@ CREATE TABLE Connection_tbl
 	Ρerson_Id int NOT NULL ,
 	Relative_Id  int ,
 	Connection_Type varchar(20),
-	FOREIGN KEY (Ρerson_Id) REFERENCES dbo.Person_tbl(Ρerson_Id)
-
+	FOREIGN KEY (Ρerson_Id) REFERENCES dbo.Person_tbl(Ρerson_Id),
 )
 GO
 
